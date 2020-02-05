@@ -1,0 +1,21 @@
+#!/bin/bash --login
+########## SBATCH Lines for Resource Request ##########
+ 
+#SBATCH --time=100:00:00             # limit of wall clock time - how long the job will run (same as -t)
+#SBATCH --nodes=1                 # number of different nodes - could be an exact number or a range of nodes (same as -N)
+#SBATCH --cpus-per-task=16           # number of CPUs (or cores) per task (same as -c)
+#SBATCH --gres=gpu:k80:1
+#SBATCH --mem=60G            # memory required per allocated CPU (or core) - amount of memory (in bytes)
+#SBATCH --job-name r2c_ori_crf_train      # you can give your job a name for easier identification (same as -J)
+
+# clear default modules
+#module purge
+ 
+# load required modules
+module load CUDA/9.0.176 cuDNN/7.0.2-CUDA-9.0.176
+#module load GCC/5.4.0-2.26 OpenMPI/1.10.3
+
+cd $HOME/vcr/r2c/models
+export PYTHONPATH=$HOME/vcr/r2c
+source activate $HOME/anaconda3/envs/r2c
+CUDA_VISIBLE_DEVICES=0 $HOME/anaconda3/envs/r2c/bin/python crf_train.py -params multiatt/crf.json -folder /mnt/ls15/scratch/users/yangshao/r2c_ori_data/crf_flagship  -vcr_data /mnt/ls15/scratch/users/yangshao/r2c_ori_data -no_tqdm
